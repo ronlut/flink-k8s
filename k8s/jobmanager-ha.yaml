@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flink-jobmanager
+  namespace: flink-k8s-example
+  labels:
+    app: flink
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flink
+      component: jobmanager
+  template:
+    metadata:
+      labels:
+        app: flink
+        component: jobmanager
+    spec:
+      terminationGracePeriodSeconds: 20
+      containers:
+        - name: jobmanager
+          image: flink-k8s-example
+          args: ["job-cluster"]
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 6123
+              name: rpc
+            - containerPort: 6124
+              name: blob
+            - containerPort: 6125
+              name: query
+            - containerPort: 8081
+              name: ui
+            - containerPort: 50010
+              name: ha
+          livenessProbe:
+            httpGet:
+              path: /overview
+              port: ui
+            initialDelaySeconds: 90
+            periodSeconds: 5
+          volumeMounts:
+            - name: flink-config-volume
+              mountPath: /opt/flink/conf
+          env:
+            - name: FLINK_CONF_DIR
+              value: /opt/flink/conf
+      volumes:
+        - name: flink-config-volume
+          configMap:
+            name: flink-config
+            items:
+              - key: flink-conf.yaml
+                path: flink-conf.yaml
+              - key: log4j.properties
+                path: log4j-console.properties
+              - key: masters
+                path: masters

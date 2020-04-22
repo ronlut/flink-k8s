@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flink-config
+  namespace: flink-k8s-example
+  labels:
+    app: flink
+data:
+  masters: |
+    flink-jobmanager:8081
+  flink-conf.yaml: |
+    # common
+    jobmanager.rpc.address: flink-jobmanager
+    jobmanager.rpc.port: 6123
+    jobmanager.heap.size: 1024m
+    taskmanager.heap.size: 1024m
+    taskmanager.numberOfTaskSlots: 1
+    parallelism.default: 2
+
+    # your ha config goes here
+
+    # web
+    rest.port: 8081
+    jobmanager.web.submit.enable: false
+
+    blob.server.port: 6124
+    queryable-state.server.ports: 6125
+    resourcemanager.rpc.port: 6123
+    query.server.port: 6125
+    taskmanager.data.port: 6121
+    taskmanager.rpc.port: 6122
+  log4j.properties: |+
+    log4j.rootLogger=INFO, console
+    log4j.logger.akka=INFO
+    log4j.logger.org.apache.kafka=INFO
+    log4j.logger.org.apache.hadoop=INFO
+    log4j.logger.org.apache.zookeeper=INFO
+    log4j.appender.console=org.apache.log4j.ConsoleAppender
+    log4j.appender.console.layout=org.apache.log4j.PatternLayout
+    log4j.appender.console.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p %-60c %x - %m%n
+    log4j.logger.org.apache.flink.shaded.akka.org.jboss.netty.channel.DefaultChannelPipeline=ERROR, console
