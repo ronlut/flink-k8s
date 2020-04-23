@@ -1,12 +1,15 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: flink-jobmanager
   namespace: flink-k8s-example
   labels:
     app: flink
 spec:
+  serviceName: flink-jobmanager
   replicas: 1
+#  updateStrategy:
+#    type: RollingUpdate
   selector:
     matchLabels:
       app: flink
@@ -18,12 +21,24 @@ spec:
         component: jobmanager
     spec:
       terminationGracePeriodSeconds: 20
+      initContainers:
+        - name: take-shared-dir-ownership
+          image: alpine:3.6
+          # Give `flink` group (id 9999) permissions to the shared mounted volume
+          command:
+            - chown
+            - -R
+            - 9999:9999
+            - /flink-shared
+          volumeMounts:
+            - name: flink-shared-volume
+              mountPath: /flink-shared
       containers:
         - name: jobmanager
           image: flink-k8s-example
-          args: ["job-cluster"]
           # remove this for real deployments
           imagePullPolicy: Never
+          args: ["job-cluster"]
           ports:
             - containerPort: 6123
               name: rpc
@@ -42,11 +57,14 @@ spec:
             initialDelaySeconds: 90
             periodSeconds: 5
           volumeMounts:
+            - name: flink-shared-volume
+              mountPath: /flink-shared
             - name: flink-config-volume
               mountPath: /opt/flink/conf
           env:
             - name: FLINK_CONF_DIR
               value: /opt/flink/conf
+#      serviceAccountName: kube-flink-jobmanager
       volumes:
         - name: flink-config-volume
           configMap:
@@ -58,3 +76,6 @@ spec:
                 path: log4j-console.properties
               - key: masters
                 path: masters
+        - name: flink-shared-volume
+          persistentVolumeClaim:
+            claimName: flink-shared-pvc

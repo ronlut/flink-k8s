@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.ronlut.empty_flink_job;
+package com.ronlut.flinkjobcluster.job;
 
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -56,6 +56,7 @@ public class StreamingJob {
 		});
 
 		endlessDummyStream.print();
+		env.enableCheckpointing(10000);
 
 		// execute program
 		env.execute("Flink Streaming Java API Skeleton");
