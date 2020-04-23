@@ -8,8 +8,6 @@ metadata:
 spec:
   serviceName: flink-jobmanager
   replicas: 1
-#  updateStrategy:
-#    type: RollingUpdate
   selector:
     matchLabels:
       app: flink
@@ -64,7 +62,6 @@ spec:
           env:
             - name: FLINK_CONF_DIR
               value: /opt/flink/conf
-#      serviceAccountName: kube-flink-jobmanager
       volumes:
         - name: flink-config-volume
           configMap:

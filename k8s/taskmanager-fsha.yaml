@@ -58,7 +58,6 @@ spec:
                 fieldPath: status.podIP
           - name: FLINK_CONF_DIR
             value: /opt/flink/conf
-#      serviceAccountName: kube-flink-taskmanager
       volumes:
         - name: flink-config-volume
           configMap:
