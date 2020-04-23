@@ -1,0 +1,27 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: flink-pv
+  namespace: flink-k8s-example
+spec:
+  capacity:
+    storage: 1Gi
+  hostPath:
+    path: /tmp/flink-k8s-example
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: standard
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: flink-shared-pvc
+  namespace: flink-k8s-example
+spec:
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  volumeName: flink-pv
+  resources:
+    requests:
+      storage: 1Gi

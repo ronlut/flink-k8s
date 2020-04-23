@@ -17,7 +17,16 @@ data:
     taskmanager.numberOfTaskSlots: 1
     parallelism.default: 2
 
-    # your ha config goes here
+    # ha
+    high-availability: com.ronlut.flinkjobcluster.filesystemha.SingleFsHaServicesFactory
+    high-availability.jobmanager.port: 50010
+    high-availability.storageDir: file:///flink-shared/ha
+
+    # Fault tolerance and checkpointing
+    state.backend: filesystem
+    state.checkpoints.dir: file:///flink-shared/checkpoints
+    state.savepoints.dir: file:///flink-shared/savepoints
+    state.checkpoints.num-retained: 10
 
     # web
     rest.port: 8081

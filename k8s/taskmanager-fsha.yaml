@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flink-taskmanager
+  namespace: flink-k8s-example
+  labels:
+    app: flink
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: flink
+      component: taskmanager
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: flink
+        component: taskmanager
+    spec:
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - flink
+                  - key: component
+                    operator: In
+                    values:
+                      - jobmanager
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: taskmanager
+          image: flink-k8s-example
+          # remove this for real deployments
+          imagePullPolicy: Never
+          args: ["task-manager", "-Dtaskmanager.host=$(POD_IP)"]
+          ports:
+            - containerPort: 6121
+              name: data
+            - containerPort: 6122
+              name: rpc
+            - containerPort: 6125
+              name: query
+          volumeMounts:
+            - name: flink-config-volume
+              mountPath: /opt/flink/conf
+            - name: flink-shared-volume
+              mountPath: /flink-shared
+          env:
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: FLINK_CONF_DIR
+            value: /opt/flink/conf
+      volumes:
+        - name: flink-config-volume
+          configMap:
+            name: flink-config
+            items:
+              - key: flink-conf.yaml
+                path: flink-conf.yaml
+              - key: log4j.properties
+                path: log4j-console.properties
+              - key: masters
+                path: masters
+        - name: flink-shared-volume
+          persistentVolumeClaim:
+            claimName: flink-shared-pvc
