@@ -11,17 +11,17 @@ This allows to run the deployments on a local minikube cluster.
 
 ## deploy-ha.sh
 Deploys a flink job cluster in a high-avalability setup. To configure HA, edit the configmap with your desired HA.
-[Link to relevant blog post]().
+[Link to relevant blog post](https://blog.ronlut.com/flink-job-cluster-on-kubernetes/).
 
 ## deploy-fsha-local.sh
 Deploys a flink job cluster using the filesystem high availability implemented in this repo.
 This uses a shared persistent volume on the local host for HA as well as state storage.
-[Link to relevant blog post]().
+[Link to relevant blog post](https://blog.ronlut.com/flink-job-cluster-on-kubernetes-file-based-high-availability/).
 
 ## deploy-fsha-aws-ebs.sh
 Deploys a flink job cluster using the filesystem high availability implemented in this repo.
 This uses an EBS persistent volume for HA as well as state storage.
-[Link to relevant blog post]().
+[Link to relevant blog post](https://blog.ronlut.com/flink-job-cluster-on-kubernetes-file-based-high-availability/).
 
 ---
 
